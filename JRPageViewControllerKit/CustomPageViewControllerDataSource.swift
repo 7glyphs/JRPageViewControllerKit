@@ -5,8 +5,9 @@
 //  Created by Panagiotis Sartzetakis on 18/01/2017.
 //  Copyright © 2017 Panagiotis Sartzetakis. All rights reserved.
 //
-import UIKit
 
+#if canImport(UIKit)
+import UIKit
 
 /// A custom implementation of the `UIPageViewControllerDataSource`.
 public final class CustomPageViewControllerDataSource: NSObject, UIPageViewControllerDataSource {
@@ -38,3 +39,4 @@ public final class CustomPageViewControllerDataSource: NSObject, UIPageViewContr
         return viewControllerBeforeViewController(pageViewController, viewController)
     }
 }
+#endif

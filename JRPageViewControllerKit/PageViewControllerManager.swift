@@ -4,6 +4,7 @@
 //  Released under an MIT license: http://opensource.org/licenses/MIT
 //
 
+#if canImport(UIKit)
 import UIKit
 
 
@@ -117,12 +118,12 @@ public final class PageViewControllerManager<T: UIViewController>: NSObject, UIS
         self.activeIndex = initialIndex
         self.spacing = spacing
 
-        let options = [UIPageViewControllerOptionInterPageSpacingKey: spacing]
+        let options = [UIPageViewController.OptionsKey.interPageSpacing: spacing]
         pageViewController = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal, options: options)
         pageViewController.view.frame =  boundsRect == .zero ? containerView.bounds : boundsRect
-        inViewController.addChildViewController(pageViewController)
+        inViewController.addChild(pageViewController)
         containerView.addSubview(pageViewController.view)
-        pageViewController.didMove(toParentViewController: inViewController)
+        pageViewController.didMove(toParent: inViewController)
 
         super.init()
 
@@ -145,7 +146,7 @@ public final class PageViewControllerManager<T: UIViewController>: NSObject, UIS
     ///   - animated: A boolen value that describes if we want the transition to be animated or not.
     ///   - completion: A completion closure that is called once the transitions finishes.
     public func show(viewControllerAt index: Int, animated: Bool = true, completion: ((Bool) -> Void)? = nil) {
-        let navigationDirection: UIPageViewControllerNavigationDirection = index > activeIndex ? .forward : .reverse
+        let navigationDirection: UIPageViewController.NavigationDirection = index > activeIndex ? .forward : .reverse
         guard let destinationViewController = self[index] else { return }
         activeIndex = index
         self.destinationViewController = destinationViewController
@@ -157,7 +158,7 @@ public final class PageViewControllerManager<T: UIViewController>: NSObject, UIS
     /// - Parameter scrollView: The scrollview where the delegate returns.
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let width = scrollView.frame.width
-        guard let destinationIndex = childrenViewControllers.index(where: { $0 == destinationViewController }) else { return }
+        guard let destinationIndex = childrenViewControllers.firstIndex(where: { $0 == destinationViewController }) else { return }
 
         let offset = max(0, scrollView.contentOffset.x)
 
@@ -195,7 +196,7 @@ fileprivate extension PageViewControllerManager {
     /// A function that returns a `CustomPageViewControllerDelegate` instance.
     ///
     /// - Returns: a `CustomPageViewControllerDelegate` instance.
-    fileprivate func customDelegate() -> CustomPageViewControllerDelegate {
+    func customDelegate() -> CustomPageViewControllerDelegate {
         
         let customPageViewControllerDelegate = CustomPageViewControllerDelegate(
             
@@ -206,7 +207,7 @@ fileprivate extension PageViewControllerManager {
             },
             pageViewControllerDidFinishAnimating: { [unowned self] pageViewController, finished, previousViewControllers, completed in
                 let destinationVC = completed ? self.destinationViewController : previousViewControllers.first
-                guard let idx = self.childrenViewControllers.index(where: { $0 == destinationVC }) else { return }
+                guard let idx = self.childrenViewControllers.firstIndex(where: { $0 == destinationVC }) else { return }
                 if self.activeIndex != idx {
                     self.activeIndex = idx
                     self.didScrollToIndex?(idx)
@@ -253,9 +254,9 @@ fileprivate extension PageViewControllerManager {
     ///   - nextIndex: A closure that defines how the next index will be calculated.
     ///   - predicate: A closure that evaluates when there is not an available `UIViewController`.
     /// - Returns: The next or previous `UIViewController`.
-    fileprivate func findViewController(pageViewController: UIPageViewController, viewController: UIViewController, nextIndex: ((Int) -> Int), predicate: ((Int) -> Bool)) -> UIViewController? {
+    func findViewController(pageViewController: UIPageViewController, viewController: UIViewController, nextIndex: ((Int) -> Int), predicate: ((Int) -> Bool)) -> UIViewController? {
         
-        guard let idx = self.childrenViewControllers.index(where: { $0 == viewController }) else { return nil }
+        guard let idx = self.childrenViewControllers.firstIndex(where: { $0 == viewController }) else { return nil }
         
         let newIndex = nextIndex(idx)
         if predicate(newIndex) {
@@ -270,7 +271,7 @@ fileprivate extension PageViewControllerManager {
     /// A function that returns a `CustomPageViewControllerDataSource` instance.
     ///
     /// - Returns: a `CustomPageViewControllerDataSource` instance.
-    fileprivate func customDataSource() -> CustomPageViewControllerDataSource {
+    func customDataSource() -> CustomPageViewControllerDataSource {
         
         let customPageViewControllerDataSource = CustomPageViewControllerDataSource(
             viewControllerAfterViewController: { [unowned self] (pageViewController, viewController) -> UIViewController? in
@@ -290,3 +291,4 @@ fileprivate extension PageViewControllerManager {
     }
 
 }
+#endif

@@ -5,14 +5,15 @@
 //  Created by Panagiotis Sartzetakis on 18/01/2017.
 //  Copyright © 2017 Panagiotis Sartzetakis. All rights reserved.
 //
-import UIKit
 
+#if canImport(UIKit)
+import UIKit
 
 public typealias PageViewControllerWillTransitionToViewController = (UIPageViewController, [UIViewController]) -> Void
 public typealias PageViewControllerDidFinishAnimating = (UIPageViewController, Bool, [UIViewController], Bool) -> Void
 public typealias PageViewControllerSupportedInterfaceOrientations = (UIPageViewController) -> UIInterfaceOrientationMask
 public typealias PageViewControllerPreferredInterfaceOrientationForPresentation = (UIPageViewController) -> UIInterfaceOrientation
-public typealias PageViewControllerSpineLocationForOrientation = (UIPageViewController, UIInterfaceOrientation) -> UIPageViewControllerSpineLocation
+public typealias PageViewControllerSpineLocationForOrientation = (UIPageViewController, UIInterfaceOrientation) -> UIPageViewController.SpineLocation
 
 /// A custom implementation of the `CustomPageViewControllerDelegate`.
 public final class CustomPageViewControllerDelegate: NSObject, UIPageViewControllerDelegate {
@@ -69,7 +70,8 @@ public final class CustomPageViewControllerDelegate: NSObject, UIPageViewControl
         return pageViewControllerPreferredInterfaceOrientationForPresentation(pageViewController)
     }
     
-    @objc public func pageViewController(_ pageViewController: UIPageViewController, spineLocationFor orientation: UIInterfaceOrientation) -> UIPageViewControllerSpineLocation {
+    @objc public func pageViewController(_ pageViewController: UIPageViewController, spineLocationFor orientation: UIInterfaceOrientation) -> UIPageViewController.SpineLocation {
         return pageViewControllerSpineLocationForOrientation(pageViewController, orientation)
     }
 }
+#endif
